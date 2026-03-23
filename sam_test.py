@@ -17,7 +17,7 @@ def run_inference(image_path, text_prompt, output_path, hf_token):
     # 2. Load Model and Processor
     # SAM 3 is roughly 848M parameters; ensure your GPU has ~8GB+ VRAM
     processor = Sam3Processor.from_pretrained("facebook/sam3")
-    model = Sam3Model.from_pretrained("facebook/sam3", torch_dtype=torch.float16).to(device)
+    model = Sam3Model.from_pretrained("facebook/sam3", torch_dtype=torch.float16, low_cpu_mem_usage=True, device_map="auto").to(device)
 
     # 3. Prepare Image and Prompt
     raw_image = Image.open(image_path).convert("RGB")
