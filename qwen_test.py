@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 # Pipeline
 pipeline = QwenImageLayeredPipeline.from_pretrained("Qwen/Qwen-Image-Layered")
-pipeline = pipeline.to("cuda", torch.bfloat16)
+pipeline = pipeline.to("cuda", torch.bfloat8)
 pipeline.set_progress_bar_config(disable=None)
 
 # Load image
