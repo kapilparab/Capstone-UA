@@ -6,7 +6,7 @@ import argparse
 # Arguments
 parser = argparse.ArgumentParser(description="QWEN Segmentation")
 parser.add_argument("--image", type=str, required=True, help="Path to map image")
-parser.add_argument("--output", type=str, default="output_mask.png", help="Path to save mask")
+parser.add_argument("--output_dir", type=str, default="output_mask.png", help="Path to save mask")
 args = parser.parse_args()
 
 # Pipeline
