@@ -4,7 +4,7 @@
 #SBATCH --partition=gpu_standard
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:volta:2
-#SBATCH --mem=80gb
+#SBATCH --mem=25gb
 #SBATCH --time=02:00:00
 
 module load python/3.11
