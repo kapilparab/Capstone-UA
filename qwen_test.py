@@ -10,7 +10,7 @@ parser.add_argument("--output_dir", type=str, default="output_mask.png", help="P
 args = parser.parse_args()
 
 # Pipeline
-pipeline = QwenImageLayeredPipeline.from_pretrained("Qwen/Qwen-Image-Layered", torch_dtype=torch.bfloat16)
+pipeline = QwenImageLayeredPipeline.from_pretrained("Qwen/Qwen-Image-Layered", torch_dtype=torch.float8)
 pipeline = pipeline.to("cuda")
 pipeline.set_progress_bar_config(disable=None)
 
