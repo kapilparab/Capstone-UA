@@ -1,5 +1,5 @@
 test_env/
+sam3_venv/
 
-*.out
 *.png
 *.txt
