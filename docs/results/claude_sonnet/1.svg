@@ -1,0 +1,11 @@
+<svg width="100%" viewBox="0 0 275 475" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Segmentation mask for Jutiapa, Guatemala</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Black background with white region highlighting Jutiapa department</desc>
+
+  <rect width="265" height="465" fill="black" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Jutiapa approximate shape - the olive overlap region in the original image -->
+  <!-- Based on the dark olive area (red+green overlap) visible in the source image -->
+  <!-- Jutiapa occupies the SE corner of Guatemala bordering El Salvador -->
+  <polygon points="&#10;      108,175&#10;      125,168&#10;      145,172&#10;      162,178&#10;      170,190&#10;      175,205&#10;      168,222&#10;      158,238&#10;      145,248&#10;      130,252&#10;      115,248&#10;      102,238&#10;      95,222&#10;      93,205&#10;      98,190&#10;    " fill="white" opacity="1" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+</svg>

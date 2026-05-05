@@ -14,7 +14,6 @@ module load python/3.11
 
 source sam3_venv/bin/activate
 
-export HF_TOKEN="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"
 export CUDA_VISIBLE_DEVICES=0
 export HYDRA_FULL_ERROR=0
 
