@@ -17,17 +17,13 @@ Our project studies the reasoning ability of vision language models (VLMs) in ge
 
 Our dataset consists of 3 components:
 
-1. Reference Image
+| Reference Image | Ground Truth Image | Text Prompt |
+| ------------- |:-------------:| -------------|
+| ![](docs/dataset/reference.png)| ![](docs/dataset/ground_truth.png) | TARGET is located in South-Central RED. It is bordered by the states of GREEN to the north-east and north-west, BLUE to the east, and YELLOW to the southwest. MAGENTA is situated north of Morelos. |
 
-![](docs/dataset/reference.png)
+#### Obtaining a copy of the dataset:
 
-2. Ground Truth Image
-
-![](docs/dataset/ground_truth.png)
-
-3. Text Prompt
-
-TARGET is located in South-Central RED. It is bordered by the states of GREEN to the north-east and north-west, BLUE to the east, and YELLOW to the southwest. MAGENTA is situated north of Morelos.
+To obtain a copy of the dataset for your own use, please contact [Dr. Steven Bethard](https://bethard.github.io/).
 
 ## Models Tested
 
@@ -43,7 +39,13 @@ TARGET is located in South-Central RED. It is bordered by the states of GREEN to
 
 ## Execution
 
+
+#### Results:
 To replicate results, please follow testing/fine tuning instructions included in each model's repository.
+
+#### Slurm:
+
+The slurm scripts located in the repository were used to schedule jobs on [University of Arizona's HPC](https://hpcdocs.hpc.arizona.edu/).
 
 ## Results
 
@@ -54,7 +56,7 @@ To replicate results, please follow testing/fine tuning instructions included in
 | Gemini 3.1 Pro | ![](docs/results/gemini_pro/1.png) | ![](docs/results/gemini_pro/2.png) |
 | Gemini 3.1 Thinking | ![](docs/results/gemini_thinking/1.png) | ![](docs/results/gemini_thinking/2.png) |
 | Claude Opus 4.7 | ![](docs/results/claude_opus/1.png) | ![](docs/results/claude_opus/2.png) |
-| Claude Sonnet 4.6 | ![](docs/results/claude_sonnet/1.png) | ![](docs/results/claude_sonnet/2.png) |
+| Claude Sonnet 4.6 | ![](docs/results/claude_sonnet/1.svg) | ![](docs/results/claude_sonnet/2.png) |
 | GLaMM | ![](docs/results/glamm/1.png) | ![](docs/results/glamm/2.png) |
 
 ## Observations
