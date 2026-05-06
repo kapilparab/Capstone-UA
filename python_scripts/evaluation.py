@@ -8,16 +8,24 @@ import csv
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate predicted masks against ground truth binary masks.")
-    parser.add_argument("--json_dir",  required=True,
-                        help="Folder of inference .json files")
+    parser.add_argument("--json_dir",
+                        help="Folder of inference .json files (mutually exclusive with --pred_mask_dir)")
+    parser.add_argument("--pred_mask_dir",
+                        help="Folder of predicted binary mask .png files — white (255) = foreground. "
+                             "Mutually exclusive with --json_dir.")
     parser.add_argument("--gt_dir",    required=True,
-                        help="Folder of ground truth binary mask .png files"
+                        help="Folder of ground truth binary mask .png files. "
                              "White (255) = foreground, Black (0) = background.")
     parser.add_argument("--output_dir", required=True,
                         help="Folder to save results CSV and summary.")
     parser.add_argument("--iou_threshold", type=float, default=0.5,
                         help="IoU threshold to count a prediction as a 'hit' (default: 0.5)")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if not args.json_dir and not args.pred_mask_dir:
+        parser.error("One of --json_dir or --pred_mask_dir is required.")
+    if args.json_dir and args.pred_mask_dir:
+        parser.error("--json_dir and --pred_mask_dir are mutually exclusive.")
+    return args
 
 
 # -----------------------------------------------------------------------------
@@ -38,32 +46,32 @@ def compute_iou(pred_binary, gt_binary):
     
 def compute_precision(pred_binary, gt_binary):
     intersection = np.logical_and(pred_binary, gt_binary).sum()
-    target_area        = gt_binary.sum()
-    if target_area == 0:
-        return 0.0
-    return float(intersection) / float(target_area)
-    
-    
-def compute_recall(pred_binary, gt_binary):
-    intersection = np.logical_and(pred_binary, gt_binary).sum()
-    predicted_area        = pred_binary.sum()
+    predicted_area = pred_binary.sum()
     if predicted_area == 0:
         return 0.0
     return float(intersection) / float(predicted_area)
-    
-    
+
+
+def compute_recall(pred_binary, gt_binary):
+    intersection = np.logical_and(pred_binary, gt_binary).sum()
+    target_area = gt_binary.sum()
+    if target_area == 0:
+        return 0.0
+    return float(intersection) / float(target_area)
+
+
 def compute_f1(pred_binary, gt_binary):
     intersection = np.logical_and(pred_binary, gt_binary).sum()
-    target_area        = gt_binary.sum()
-    if target_area == 0:
+    predicted_area = pred_binary.sum()
+    if predicted_area == 0:
         p = 0.0
     else:
-        p = float(intersection) / float(target_area)
-    predicted_area        = pred_binary.sum()
-    if predicted_area == 0:
+        p = float(intersection) / float(predicted_area)
+    target_area = gt_binary.sum()
+    if target_area == 0:
         r = 0.0
     else:
-        r = float(intersection) / float(predicted_area)
+        r = float(intersection) / float(target_area)
     numer = 2 * p * r
     denom = p + r
     if denom == 0:
@@ -159,6 +167,37 @@ def evaluate_single(json_path, gt_path):
     }
 
 
+def evaluate_single_png(pred_path, gt_path):
+    """
+    Compare a predicted binary mask PNG against a ground truth binary mask PNG.
+    White pixels (>127) are treated as foreground in both images.
+    """
+    gt_array    = np.array(Image.open(gt_path).convert("L"))
+    gt_binary   = gt_array > 127
+
+    pred_array  = np.array(Image.open(pred_path).convert("L"))
+    pred_binary = pred_array > 127
+
+    iou       = compute_iou(pred_binary,       gt_binary)
+    dice      = compute_dice(pred_binary,      gt_binary)
+    precision = compute_precision(pred_binary, gt_binary)
+    recall    = compute_recall(pred_binary,    gt_binary)
+    f1        = compute_f1(pred_binary,        gt_binary)
+
+    return {
+        "n_pred_masks":  1,
+        "best_iou":      round(iou,       4),
+        "best_dice":     round(dice,      4),
+        "best_p":        round(precision, 4),
+        "best_r":        round(recall,    4),
+        "best_f1":       round(f1,        4),
+        "best_mask_idx": 0,
+        "caption":       "",
+        "phrases":       [],
+        "note":          "",
+    }
+
+
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
@@ -167,12 +206,18 @@ if __name__ == "__main__":
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
 
-    json_files = sorted([f for f in os.listdir(args.json_dir) if f.endswith(".json")])
-    if not json_files:
-        print(f"[ERROR] No .json files found in {args.json_dir}")
-        exit(1)
-
-    print(f"Found {len(json_files)} JSON files. Evaluating...\n")
+    if args.json_dir:
+        input_files = sorted([f for f in os.listdir(args.json_dir) if f.endswith(".json")])
+        if not input_files:
+            print(f"[ERROR] No .json files found in {args.json_dir}")
+            exit(1)
+        print(f"Found {len(input_files)} JSON files. Evaluating...\n")
+    else:
+        input_files = sorted([f for f in os.listdir(args.pred_mask_dir) if f.lower().endswith(".png")])
+        if not input_files:
+            print(f"[ERROR] No .png files found in {args.pred_mask_dir}")
+            exit(1)
+        print(f"Found {len(input_files)} predicted mask PNG files. Evaluating...\n")
 
     rows          = []   # for CSV
     missing_gt    = []
@@ -183,17 +228,19 @@ if __name__ == "__main__":
     all_f1 = []
     hits          = 0    # predictions with IoU >= threshold
 
-    for json_file in json_files:
-        stem      = os.path.splitext(json_file)[0]          # 'GL123_345'
-        json_path = os.path.join(args.json_dir, json_file)
-        gt_path   = os.path.join(args.gt_dir,   stem + ".png")
+    for input_file in input_files:
+        stem    = os.path.splitext(input_file)[0]           # 'GL123_345'
+        gt_path = os.path.join(args.gt_dir, stem + ".png")
 
         if not os.path.exists(gt_path):
-            print(f"  [WARNING] No GT mask for {json_file} (expected: {gt_path})")
+            print(f"  [WARNING] No GT mask for {input_file} (expected: {gt_path})")
             missing_gt.append(stem)
             continue
 
-        result = evaluate_single(json_path, gt_path)
+        if args.json_dir:
+            result = evaluate_single(os.path.join(args.json_dir, input_file), gt_path)
+        else:
+            result = evaluate_single_png(os.path.join(args.pred_mask_dir, input_file), gt_path)
 
         all_ious.append(result["best_iou"])
         all_dices.append(result["best_dice"])
@@ -217,7 +264,7 @@ if __name__ == "__main__":
             "note":          result["note"],
         })
 
-        status = f"IoU={result['best_iou']:.3f}  Dice={result['best_dice']:.3f} P={result['best_p']:.3f}  R={result['best_r']:.3f} F1={result['best_f1']:.3f}"
+        status = f"IoU={result['best_iou']:.3f}  Dice={result['best_dice']:.3f}  P={result['best_p']:.3f}  R={result['best_r']:.3f}  F1={result['best_f1']:.3f}"
         if result["note"]:
             status += f"  [{result['note']}]"
         print(f"  {stem:30s}  {status}")
