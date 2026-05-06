@@ -1,0 +1,18 @@
+====================================================
+EVALUATION SUMMARY
+====================================================
+Images evaluated   : 10
+Missing GT masks   : 0
+Mean IoU           : 0.1436
+Mean Dice          : 0.1863
+Mean P          : 0.2424
+Mean R          : 0.3535
+Mean F1           : 0.1863
+Hit rate (IoU>=0.50): 0.1  (1/10)
+====================================================
+
+Metric guide:
+  IoU  >= 0.75  → strong segmentation
+  IoU  >= 0.50  → acceptable (COCO standard threshold)
+  IoU  <  0.25  → poor overlap, review these images
+  Dice >= 0.80  → strong, especially for small masks

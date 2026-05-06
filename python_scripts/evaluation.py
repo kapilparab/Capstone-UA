@@ -27,11 +27,6 @@ def parse_args():
         parser.error("--json_dir and --pred_mask_dir are mutually exclusive.")
     return args
 
-
-# -----------------------------------------------------------------------------
-# Core metrics
-# -----------------------------------------------------------------------------
-
 def compute_iou(pred_binary, gt_binary):
     """
     Compute IoU between two boolean/binary numpy arrays.
@@ -42,8 +37,7 @@ def compute_iou(pred_binary, gt_binary):
     if union == 0:
         return 0.0
     return float(intersection) / float(union)
-    
-    
+
 def compute_precision(pred_binary, gt_binary):
     intersection = np.logical_and(pred_binary, gt_binary).sum()
     predicted_area = pred_binary.sum()
@@ -51,14 +45,12 @@ def compute_precision(pred_binary, gt_binary):
         return 0.0
     return float(intersection) / float(predicted_area)
 
-
 def compute_recall(pred_binary, gt_binary):
     intersection = np.logical_and(pred_binary, gt_binary).sum()
     target_area = gt_binary.sum()
     if target_area == 0:
         return 0.0
     return float(intersection) / float(target_area)
-
 
 def compute_f1(pred_binary, gt_binary):
     intersection = np.logical_and(pred_binary, gt_binary).sum()
@@ -78,7 +70,6 @@ def compute_f1(pred_binary, gt_binary):
         return 0.0
     return float(numer) / float(denom)
 
-
 def compute_dice(pred_binary, gt_binary):
     """
     Dice = 2 * |A ∩ B| / (|A| + |B|)
@@ -90,11 +81,6 @@ def compute_dice(pred_binary, gt_binary):
     if denom == 0:
         return 0.0
     return float(2 * intersection) / float(denom)
-
-
-# -----------------------------------------------------------------------------
-# Per-image evaluation
-# -----------------------------------------------------------------------------
 
 def evaluate_single(json_path, gt_path):
     """
@@ -118,10 +104,6 @@ def evaluate_single(json_path, gt_path):
             "best_p":     0.0,
             "best_r":    0.0,
             "best_f1":     0.0,
-            "best_mask_idx": None,
-            "caption":      data.get("caption", ""),
-            "phrases":      data.get("phrases", []),
-            "note":         "no predicted masks",
         }
 
     best_iou   = 0.0
@@ -129,7 +111,6 @@ def evaluate_single(json_path, gt_path):
     best_p = 0.0
     best_r = 0.0
     best_f1 = 0.0
-    best_idx   = 0
 
     for i, pred_mask in enumerate(pred_masks):
         rle = pred_mask
@@ -148,7 +129,6 @@ def evaluate_single(json_path, gt_path):
         if iou > best_iou:
             best_iou  = iou
             best_dice = dice
-            best_idx  = i
             best_p = precision
             best_r = recall
             best_f1 = f1
@@ -160,22 +140,23 @@ def evaluate_single(json_path, gt_path):
         "best_p":    round(best_p, 4),
         "best_r":   round(best_r, 4),
         "best_f1":  round(best_f1, 4),
-        "best_mask_idx": best_idx,
-        "caption":       data.get("caption", ""),
-        "phrases":       data.get("phrases", []),
-        "note":          "",
     }
-
 
 def evaluate_single_png(pred_path, gt_path):
     """
     Compare a predicted binary mask PNG against a ground truth binary mask PNG.
     White pixels (>127) are treated as foreground in both images.
+    If the predicted mask has a different spatial size than the GT mask it is
+    resized to match using nearest-neighbour interpolation (preserves binary values).
     """
-    gt_array    = np.array(Image.open(gt_path).convert("L"))
+    gt_img      = Image.open(gt_path).convert("L")
+    gt_array    = np.array(gt_img)
     gt_binary   = gt_array > 127
 
-    pred_array  = np.array(Image.open(pred_path).convert("L"))
+    pred_img    = Image.open(pred_path).convert("L")
+    if pred_img.size != gt_img.size:          # PIL size is (W, H)
+        pred_img = pred_img.resize(gt_img.size, resample=Image.NEAREST)
+    pred_array  = np.array(pred_img)
     pred_binary = pred_array > 127
 
     iou       = compute_iou(pred_binary,       gt_binary)
@@ -191,16 +172,7 @@ def evaluate_single_png(pred_path, gt_path):
         "best_p":        round(precision, 4),
         "best_r":        round(recall,    4),
         "best_f1":       round(f1,        4),
-        "best_mask_idx": 0,
-        "caption":       "",
-        "phrases":       [],
-        "note":          "",
     }
-
-
-# -----------------------------------------------------------------------------
-# Main
-# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     args = parse_args()
@@ -219,17 +191,17 @@ if __name__ == "__main__":
             exit(1)
         print(f"Found {len(input_files)} predicted mask PNG files. Evaluating...\n")
 
-    rows          = []   # for CSV
-    missing_gt    = []
-    all_ious      = []
-    all_dices     = []
+    rows = []
+    missing_gt = []
+    all_ious = []
+    all_dices = []
     all_p = []
     all_r = []
     all_f1 = []
-    hits          = 0    # predictions with IoU >= threshold
+    hits = 0 
 
     for input_file in input_files:
-        stem    = os.path.splitext(input_file)[0]           # 'GL123_345'
+        stem    = os.path.splitext(input_file)[0]
         gt_path = os.path.join(args.gt_dir, stem + ".png")
 
         if not os.path.exists(gt_path):
@@ -257,17 +229,10 @@ if __name__ == "__main__":
             "best_p":     result["best_p"],
             "best_r":     result["best_r"],
             "best_f1":     result["best_f1"],
-            "best_mask_idx": result["best_mask_idx"],
-            "n_pred_masks":  result["n_pred_masks"],
-            "caption":       result["caption"],
-            "phrases":       "; ".join(result["phrases"]),
-            "note":          result["note"],
         })
 
         status = f"IoU={result['best_iou']:.3f}  Dice={result['best_dice']:.3f}  P={result['best_p']:.3f}  R={result['best_r']:.3f}  F1={result['best_f1']:.3f}"
-        if result["note"]:
-            status += f"  [{result['note']}]"
-        print(f"  {stem:30s}  {status}")
+        print(f"{stem:30s} {status}")
 
     # -------------------------------------------------------------------------
     # Aggregate summary
@@ -309,13 +274,12 @@ if __name__ == "__main__":
 
     # Per-image CSV
     csv_path = os.path.join(args.output_dir, "eval_results.csv")
-    fieldnames = ["image_id", "best_iou", "best_dice", "best_p", "best_r", "best_f1", "best_mask_idx",
-                  "n_pred_masks", "caption", "phrases", "note"]
+    fieldnames = ["image_id", "best_iou", "best_dice", "best_p", "best_r", "best_f1"]
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"\nPer-image results saved to : {csv_path}")
+    print(f"\nPer-image results saved to: {csv_path}")
 
     # Summary text file
     summary_path = os.path.join(args.output_dir, "eval_summary.txt")
@@ -325,4 +289,4 @@ if __name__ == "__main__":
             f.write("\nMissing GT masks:\n")
             for s in missing_gt:
                 f.write(f"  - {s}\n")
-    print(f"Summary saved to           : {summary_path}")
+    print(f"Summary saved to: {summary_path}")
