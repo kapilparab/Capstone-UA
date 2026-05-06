@@ -29,7 +29,7 @@ To obtain a copy of the dataset for your own use, please contact [Dr. Steven Bet
 
 | Models  | Repo Link |
 | ------------- |:-------------:|
-| GLaMM      | [Repo](https://github.com/mbzuai-oryx/groundingLMM) |
+| GLaMM      | [Repo](https://github.com/VeraJSolo/groundingLMM-UA) |
 | GeoPixel      | [Repo](https://github.com/kapilparab/GeoPixel)     |
 | SAM3      | [Repo](https://github.com/kapilparab/sam3-UA)     |
 | Molmo      | [Repo](https://github.com/allenai/molmo) |
