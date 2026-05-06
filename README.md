@@ -2,7 +2,7 @@
 
 # Evaluating large vision-language models on geographic language understanding
 
-This project was developed under the course INFO698: Capstone
+This project was developed under the course INFO 698: Capstone
 
 ## Team Members
 
@@ -63,9 +63,15 @@ The slurm scripts located in the repository were used to schedule jobs on [Unive
 
 * While GLaMM can perform segmentation tasks, it struggles with understanding and implementing geographic language and color merging (even when explained in the prompt).
 
+* All models have great segmentation capabilities. They can extract pixel perfect masks using boundaries.
+
+* Out of the box models like Gemini and Claude perform slightly better if the prompt contains hints about the region. For example, the prompt for the image in the 2nd column in the results table above contains the word "Morelos". Gemini and Claude were successful in reasoning where the region is actually located and create the resulting boundaries.
+
 ## Future Scope
 
 * Incorporate information about color blending and coordinates as vector embeddings.
+
+* Create a custom model with specific encoder-decoder components similar to GeoPixel and GLaMM.
 
 ## References
 
