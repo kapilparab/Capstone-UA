@@ -86,3 +86,7 @@ The slurm scripts located in the repository were used to schedule jobs on [Unive
 [5] Marimo, C., Blumenstiel, B., Nitsche, M., Jakubik, J., & Brunschwiler, T. (2025). Beyond the visible: Multispectral vision–language learning for Earth observation. arXiv. https://arxiv.org/abs/2503.15969 
 
 [6] Waheed, S., Min An, N., Milford, M., Ramchurn, S., & Ehsan, S. (2025). VLM-guided visual place recognition for planet-scale geo-localization. arXiv. https://arxiv.org/abs/2507.17455 
+
+## AI Disclosure
+
+[Claude](https://claude.ai/) was used for debugging and prototyping scripts.
