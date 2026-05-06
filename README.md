@@ -6,8 +6,8 @@ This project was developed under the course INFO698: Capstone
 
 ## Team Members
 
-* Kapil Parab  [LinkedIn](https://www.linkedin.com/in/kapilparab/)
-* Vera Jackson  [LinkedIn](https://www.linkedin.com/in/vera-soloview-jackson/)
+* [Kapil Parab](https://www.linkedin.com/in/kapilparab/)
+* [Vera Jackson](https://www.linkedin.com/in/vera-soloview-jackson/)
 
 ## Abstract
 
