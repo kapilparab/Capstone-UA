@@ -44,7 +44,7 @@ To replicate results, please follow testing/fine tuning instructions included in
 
 #### Slurm:
 
-The slurm scripts located in the repository were used to schedule jobs on [University of Arizona's HPC](https://hpcdocs.hpc.arizona.edu/).
+The slurm scripts located in [the repository](https://github.com/kapilparab/Capstone-UA/tree/main/slurm) were used to schedule jobs on [University of Arizona's HPC](https://hpcdocs.hpc.arizona.edu/).
 
 ## Results
 
